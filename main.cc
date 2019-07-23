@@ -56,7 +56,10 @@ int main(int argc, char **argv)
     Aws::Client::ClientConfiguration configuration;
     configuration.endpointOverride = host.c_str();
     configuration.region = "us-east-1";
-    configuration.scheme = Aws::Http::Scheme::HTTP;
+    if (FLAGS_https)
+        configuration.scheme = Aws::Http::Scheme::HTTPS;
+    else
+        configuration.scheme = Aws::Http::Scheme::HTTP;
 
     auto client =
         std::make_unique<Aws::S3::S3Client>(credentials, configuration,
@@ -99,7 +102,6 @@ int main(int argc, char **argv)
 
         marker = outcome.GetResult().GetContents().back().GetKey().c_str();
         request.SetMarker(marker);
-
     }
 
     std::cout << "Total time: " << duration_cast<seconds>(totalTime).count()
